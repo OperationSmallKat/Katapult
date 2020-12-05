@@ -46,7 +46,8 @@ fi
 if (! test -e ~/bin/katapult.desktop) then
 	echo "[Desktop Entry]
 	Version=1.0
-	Type=Katapult SmallKat Launcher
+	Type=Application
+	Name=Katapult SmallKat Launcher
 	Comment=
 	Exec=$HOME/bin/katapult.sh
 	Icon=$HOME/bowler-workspace/gitcache/github.com/OperationSmallKat/Katapult/icon.png
