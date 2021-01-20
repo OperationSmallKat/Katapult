@@ -14,14 +14,19 @@ import net.java.games.input.Event;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 
-ScriptingEngine.pull("https://github.com/CommonWealthRobotics/DeviceProviders.git");
-ScriptingEngine.gitScriptRun("https://github.com/CommonWealthRobotics/DeviceProviders.git",
-		"loadAll.groovy", null);
+//ScriptingEngine.pull("https://github.com/CommonWealthRobotics/DeviceProviders.git");
+//ScriptingEngine.gitScriptRun("https://github.com/CommonWealthRobotics/DeviceProviders.git",
+//		"loadAll.groovy", null);
 
 MobileBase cat =DeviceManager.getSpecificDevice("Luna", {
 		return ScriptingEngine.gitScriptRun(	"https://github.com/OperationSmallKat/Luna.git",
 	"MediumKat.xml",null);
 	})
+def device = DeviceManager.getSpecificDevice("midnight")
+if(device.simple.isVirtual()) {
+	println "SmallKat Device is missing"
+	return;
+}
 //Check if the device already exists in the device Manager
 def g=DeviceManager.getSpecificDevice("gamepad",{
 	def t = new BowlerJInputDevice("Dragon","X-Box","Game"); //
@@ -34,7 +39,7 @@ HashMap<DHParameterKinematics,TransformNR > getTipLocations(def base){
 	def tipList = new HashMap<DHParameterKinematics,TransformNR >()
 	for(DHParameterKinematics leg:legs){
 		// Read the location of the foot before moving the body
-		def home =leg.getCurrentTaskSpaceTransform()
+		def home =leg.calcHome()
 		tipList.put(leg,home)
 	}
 	return tipList
