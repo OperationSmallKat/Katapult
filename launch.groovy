@@ -109,7 +109,7 @@ IGameControlEvent listener = new IGameControlEvent() {
 				tips = getTipLocations( cat)
 			}
 		}
-			System.out.println(name+" is value= "+value);
+		//	System.out.println(name+" is value= "+value);
 		
 	}
 }
