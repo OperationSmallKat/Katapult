@@ -5,6 +5,7 @@ import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR
 import com.neuronrobotics.sdk.common.DeviceManager
 import com.neuronrobotics.sdk.util.ThreadUtil
 import com.neuronrobotics.bowlerstudio.BowlerStudio
+import com.neuronrobotics.bowlerstudio.assets.ConfigurationDatabase
 import com.neuronrobotics.bowlerstudio.scripting.ScriptingEngine
 import com.neuronrobotics.sdk.addons.gamepad.BowlerJInputDevice;
 import com.neuronrobotics.sdk.addons.gamepad.IGameControlEvent
@@ -18,18 +19,24 @@ import net.java.games.input.ControllerEnvironment;
 //ScriptingEngine.gitScriptRun("https://github.com/CommonWealthRobotics/DeviceProviders.git",
 //		"loadAll.groovy", null);
 
-MobileBase cat =DeviceManager.getSpecificDevice("Luna", {
-		return ScriptingEngine.gitScriptRun(	"https://github.com/OperationSmallKat/Luna.git",
-	"MediumKat.xml",null);
+String robotName = ConfigurationDatabase.getObject("katapult", "robotName", "Luna")
+String robotGit = ConfigurationDatabase.getObject("katapult", "robotGit", "https://github.com/OperationSmallKat/Luna.git")
+String robotGitFile = ConfigurationDatabase.getObject("katapult", "robotGitFile", "MediumKat.xml")
+String linkDeviceName = ConfigurationDatabase.getObject("katapult", "linkDeviceName", "midnight")
+List<String> gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", ["Dragon","X-Box","Game"])
+
+MobileBase cat =DeviceManager.getSpecificDevice(robotName, {
+		return ScriptingEngine.gitScriptRun(	robotGit,
+	robotGitFile,null);
 	})
-def device = DeviceManager.getSpecificDevice("midnight")
+def device = DeviceManager.getSpecificDevice(linkDeviceName)
 if(device.simple.isVirtual()) {
-	println "SmallKat Device is missing"
-	return;
+	println "SmallKat Device is virtual"
+	//return;
 }
 //Check if the device already exists in the device Manager
 def g=DeviceManager.getSpecificDevice("gamepad",{
-	def t = new BowlerJInputDevice("Dragon","X-Box","Game"); //
+	def t = new BowlerJInputDevice(gameControllerNames); //
 	t.connect(); // Connect to it.
 	return t
 })
