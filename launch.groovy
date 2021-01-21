@@ -10,11 +10,6 @@ import com.neuronrobotics.bowlerstudio.scripting.ScriptingEngine
 import com.neuronrobotics.sdk.addons.gamepad.BowlerJInputDevice;
 import com.neuronrobotics.sdk.addons.gamepad.IGameControlEvent
 
-import net.java.games.input.Component;
-import net.java.games.input.Event;
-import net.java.games.input.Controller;
-import net.java.games.input.ControllerEnvironment;
-
 //ScriptingEngine.pull("https://github.com/CommonWealthRobotics/DeviceProviders.git");
 //ScriptingEngine.gitScriptRun("https://github.com/CommonWealthRobotics/DeviceProviders.git",
 //		"loadAll.groovy", null);
@@ -34,12 +29,18 @@ if(device.simple.isVirtual()) {
 	println "SmallKat Device is virtual"
 	//return;
 }
+BowlerJInputDevice g
+try {
 //Check if the device already exists in the device Manager
-def g=DeviceManager.getSpecificDevice("gamepad",{
+g=DeviceManager.getSpecificDevice("gamepad",{
 	def t = new BowlerJInputDevice(gameControllerNames); //
 	t.connect(); // Connect to it.
 	return t
 })
+}catch(Throwable t) {
+	println "No game controllers found, Searched:\n"+gameControllerNames
+	return;
+}
 
 HashMap<DHParameterKinematics,TransformNR > getTipLocations(def base){
 	def legs = base.getLegs()
