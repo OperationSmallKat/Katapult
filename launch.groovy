@@ -131,7 +131,7 @@ g.clearListeners()
 g.addListeners(listener);
 // wait while the application is not stopped
 try{
-	while(!Thread.interrupted() ){
+	while(!Thread.interrupted() && cat.isAvailable()){
 		ThreadUtil.wait(30)
 		if(Math.abs(x)>0.001 || Math.abs(straif)>0.001 || Math.abs(rz)>0.001 || Math.abs(ljud)>0.001) {
 			if(walkMode) {
