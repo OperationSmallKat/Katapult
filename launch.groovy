@@ -18,7 +18,7 @@ String robotName = ConfigurationDatabase.getObject("katapult", "robotName", "Lun
 String robotGit = ConfigurationDatabase.getObject("katapult", "robotGit", "https://github.com/OperationSmallKat/Luna.git")
 String robotGitFile = ConfigurationDatabase.getObject("katapult", "robotGitFile", "MediumKat.xml")
 String linkDeviceName = ConfigurationDatabase.getObject("katapult", "linkDeviceName", "midnight")
-List<String> gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", ["Dragon","X-Box","Game","XBOX"])
+List<String> gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", ["Dragon","X-Box","Game","XBOX","Microsoft"])
 
 MobileBase cat =DeviceManager.getSpecificDevice(robotName, {
 		return ScriptingEngine.gitScriptRun(	robotGit,
