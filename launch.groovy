@@ -37,17 +37,20 @@ if(device.simple.isVirtual()) {
 }
 BowlerJInputDevice g
 List<String> alreadyConnected = DeviceManager.listConnectedDevice(BowlerJInputDevice.class)
-gameControllerNames.addAll(alreadyConnected);
-try {
-	//Check if the device already exists in the device Manager
-	g=DeviceManager.getSpecificDevice("gamepad",{
-		def t = new BowlerJInputDevice(gameControllerNames); //
-		t.connect(); // Connect to it.
-		return t
-	})
-}catch(Throwable t) {
-	println "No game controllers found, Searched:\n"+gameControllerNames
-	return;
+if(alreadyConnected.size()==0) {
+	try {
+		//Check if the device already exists in the device Manager
+		g=DeviceManager.getSpecificDevice("gamepad",{
+			def t = new BowlerJInputDevice(gameControllerNames); //
+			t.connect(); // Connect to it.
+			return t
+		})
+	}catch(Throwable t) {
+		println "No game controllers found, Searched:\n"+gameControllerNames
+		return;
+	}
+}else {
+	g=DeviceManager.getSpecificDevice(alreadyConnected.get(0))
 }
 
 HashMap<DHParameterKinematics,TransformNR > getTipLocations(def base){
