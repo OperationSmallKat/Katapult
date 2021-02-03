@@ -18,25 +18,33 @@ String robotName = ConfigurationDatabase.getObject("katapult", "robotName", "Lun
 String robotGit = ConfigurationDatabase.getObject("katapult", "robotGit", "https://github.com/OperationSmallKat/Luna.git")
 String robotGitFile = ConfigurationDatabase.getObject("katapult", "robotGitFile", "MediumKat.xml")
 String linkDeviceName = ConfigurationDatabase.getObject("katapult", "linkDeviceName", "midnight")
-List<String> gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", ["Dragon","X-Box","Game","XBOX","Microsoft"])
+List<String> gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", [
+	"Dragon",
+	"X-Box",
+	"Game",
+	"XBOX",
+	"Microsoft"
+])
 
 MobileBase cat =DeviceManager.getSpecificDevice(robotName, {
-		return ScriptingEngine.gitScriptRun(	robotGit,
-	robotGitFile,null);
-	})
+	return ScriptingEngine.gitScriptRun(	robotGit,
+			robotGitFile,null);
+})
 def device = DeviceManager.getSpecificDevice(linkDeviceName)
 if(device.simple.isVirtual()) {
 	println "SmallKat Device is virtual"
 	//return;
 }
 BowlerJInputDevice g
+List<String> alreadyConnected = DeviceManager.listConnectedDevice(BowlerJInputDevice.class)
+gameControllerNames.addAll(alreadyConnected);
 try {
-//Check if the device already exists in the device Manager
-g=DeviceManager.getSpecificDevice("gamepad",{
-	def t = new BowlerJInputDevice(gameControllerNames); //
-	t.connect(); // Connect to it.
-	return t
-})
+	//Check if the device already exists in the device Manager
+	g=DeviceManager.getSpecificDevice("gamepad",{
+		def t = new BowlerJInputDevice(gameControllerNames); //
+		t.connect(); // Connect to it.
+		return t
+	})
 }catch(Throwable t) {
 	println "No game controllers found, Searched:\n"+gameControllerNames
 	return;
@@ -63,7 +71,7 @@ void pose(def newAbsolutePose, MobileBase base, def tipList){
 		def previous = base.getFiducialToGlobalTransform();
 		// Perform a pose opperation
 		base.setGlobalToFiducialTransform(newPoseAdjustedBacktoRobotCenterFrame)
-		
+
 		for(def leg:legs){
 			def pose =tipList.get(leg)
 			if(leg.checkTaskSpaceTransform(pose))// move the leg only is the pose of hte limb is possible
@@ -92,40 +100,40 @@ def walkMode = true
 def startPose
 def tips
 IGameControlEvent listener = new IGameControlEvent() {
-	@Override public void onEvent(String name,float value) {
-		
-		if(name.contentEquals("l-joy-left-right")){
-			straif=-value;
-		}
-		else if(name.contentEquals("r-joy-up-down")){
-			x=-value;
-		}
-		else if(name.contentEquals("l-joy-up-down")){
-			ljud=value;
-		}
-		else if(name.contentEquals("r-joy-left-right")){
-			rz=value;
-		}
-		else if(name.contentEquals("x-mode")){
-			if(value>0) {
-				if(!walkMode) {
-					pose(new TransformNR(),cat,tips)
+			@Override public void onEvent(String name,float value) {
+
+				if(name.contentEquals("l-joy-left-right")){
+					straif=-value;
 				}
-				walkMode=true;
+				else if(name.contentEquals("r-joy-up-down")){
+					x=-value;
+				}
+				else if(name.contentEquals("l-joy-up-down")){
+					ljud=value;
+				}
+				else if(name.contentEquals("r-joy-left-right")){
+					rz=value;
+				}
+				else if(name.contentEquals("x-mode")){
+					if(value>0) {
+						if(!walkMode) {
+							pose(new TransformNR(),cat,tips)
+						}
+						walkMode=true;
+					}
+				}
+				else if(name.contentEquals("y-mode")){
+					if(value>0) {
+						walkMode=false;
+						startPose = cat.getFiducialToGlobalTransform()
+
+						tips = getTipLocations( cat)
+					}
+				}
+				//	System.out.println(name+" is value= "+value);
+
 			}
 		}
-		else if(name.contentEquals("y-mode")){
-			if(value>0) {
-				walkMode=false;
-				startPose = cat.getFiducialToGlobalTransform()
-				
-				tips = getTipLocations( cat)
-			}
-		}
-		//	System.out.println(name+" is value= "+value);
-		
-	}
-}
 g.clearListeners()
 // gamepad is a BowlerJInputDevice
 g.addListeners(listener);
