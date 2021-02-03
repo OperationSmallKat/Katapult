@@ -18,7 +18,7 @@ String robotName = ConfigurationDatabase.getObject("katapult", "robotName", "Lun
 String robotGit = ConfigurationDatabase.getObject("katapult", "robotGit", "https://github.com/OperationSmallKat/Luna.git")
 String robotGitFile = ConfigurationDatabase.getObject("katapult", "robotGitFile", "MediumKat.xml")
 String linkDeviceName = ConfigurationDatabase.getObject("katapult", "linkDeviceName", "midnight")
-List<String> gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", [
+def gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", [
 	"Dragon",
 	"X-Box",
 	"Game",
@@ -50,7 +50,12 @@ if(alreadyConnected.size()==0) {
 		return;
 	}
 }else {
-	g=DeviceManager.getSpecificDevice(alreadyConnected.get(0))
+	def name =alreadyConnected.get(0)
+	g=DeviceManager.getSpecificDevice(name)
+	if(!gameControllerNames.contains(name)) {
+		gameControllerNames.add(name);
+		ConfigurationDatabase.save();
+	}
 }
 
 HashMap<DHParameterKinematics,TransformNR > getTipLocations(def base){
