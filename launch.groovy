@@ -53,7 +53,10 @@ if(alreadyConnected.size()==0) {
 	def name =alreadyConnected.get(0)
 	g=DeviceManager.getSpecificDevice(name)
 	if(!gameControllerNames.contains(name)) {
-		gameControllerNames.add(name);
+		def newList=[]
+		newList.addAll(gameControllerNames)
+		newList.add(name)
+		ConfigurationDatabase.setObject("katapult", "gameControllerNames", newList)
 		ConfigurationDatabase.save();
 	}
 }
