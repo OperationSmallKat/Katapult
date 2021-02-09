@@ -110,8 +110,10 @@ def ljud =0;
 def walkMode = true
 def startPose
 def tips
+long timeOfLast = System.currentTimeMillis()
 IGameControlEvent listener = new IGameControlEvent() {
 			@Override public void onEvent(String name,float value) {
+				timeOfLast = System.currentTimeMillis()
 
 				if(name.contentEquals("l-joy-left-right")){
 					straif=-value;
@@ -152,15 +154,17 @@ g.addListeners(listener);
 try{
 	while(!Thread.interrupted() && cat.isAvailable()){
 		ThreadUtil.wait(30)
-		if(Math.abs(x)>0.001 || Math.abs(straif)>0.001 || Math.abs(rz)>0.001 || Math.abs(ljud)>0.001) {
-			if(walkMode) {
+		if(walkMode) {
+			if(Math.abs(x)>0.001 || Math.abs(straif)>0.001 || Math.abs(rz)>0.001 || Math.abs(ljud)>0.001) {
+
 				def newPose = new TransformNR(x*0.1,straif*0.1,0,new RotationNR(0, rz*0.05, 0))
 				//println newPose
 				cat.DriveArc(newPose, 0.0020);
-			}else {
-				// pose mode
-				pose(new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud)),cat,tips)
+
 			}
+		}else {
+			// pose mode
+			pose(new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud)),cat,tips)
 		}
 	}
 }catch(Throwable t){
