@@ -157,7 +157,7 @@ try{
 		if(walkMode) {
 			if(Math.abs(x)>0.001 || Math.abs(straif)>0.001 || Math.abs(rz)>0.001 || Math.abs(ljud)>0.001) {
 
-				def newPose = new TransformNR(x*0.4,straif*0.1,0,new RotationNR(0, rz*0.05, 0))
+				def newPose = new TransformNR(x*0.4,straif*0.2,0,new RotationNR(0, rz*0.2, 0))
 				//println newPose
 				cat.DriveArc(newPose, 0.0020);
 
