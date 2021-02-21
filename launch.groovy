@@ -61,45 +61,6 @@ if(alreadyConnected.size()==0) {
 	}
 }
 
-HashMap<DHParameterKinematics,TransformNR > getTipLocations(def base){
-	def legs = base.getLegs()
-	def tipList = new HashMap<DHParameterKinematics,TransformNR >()
-	for(DHParameterKinematics leg:legs){
-		// Read the location of the foot before moving the body
-		def home =leg.calcHome()
-		tipList.put(leg,home)
-	}
-	return tipList
-}
-
-void pose(def newAbsolutePose, MobileBase base, def tipList){
-	def legs = base.getLegs()
-	try{
-
-		def imuCenter = base.getIMUFromCentroid()
-		def newPoseTransformedToIMUCenter = newAbsolutePose.times(imuCenter.inverse())
-		def newPoseAdjustedBacktoRobotCenterFrame = imuCenter.times(newPoseTransformedToIMUCenter)
-		def previous = base.getFiducialToGlobalTransform();
-		// Perform a pose opperation
-		base.setGlobalToFiducialTransform(newPoseAdjustedBacktoRobotCenterFrame)
-
-		for(def leg:legs){
-			def pose =tipList.get(leg)
-			if(leg.checkTaskSpaceTransform(pose))// move the leg only is the pose of hte limb is possible
-				leg.setDesiredTaskSpaceTransform(pose, 0);// set leg to the location of where the foot was
-			else{
-				base.setGlobalToFiducialTransform(previous)
-				for(def l:legs){
-					def p =tipList.get(l)
-					l.setDesiredTaskSpaceTransform(p, 0);// set leg to the location of where the foot was
-				}
-				return;
-			}
-		}
-	}catch (Throwable t){
-		BowlerStudio.printStackTrace(t)
-	}
-}
 
 
 def x =0;
@@ -164,7 +125,7 @@ try{
 			}
 		}else {
 			// pose mode
-			pose(new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud)),cat,tips)
+			cat.pose(new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud)))
 		}
 	}
 }catch(Throwable t){
