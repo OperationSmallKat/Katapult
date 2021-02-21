@@ -72,6 +72,7 @@ def walkMode = true
 def startPose
 def tips
 long timeOfLast = System.currentTimeMillis()
+
 IGameControlEvent listener = new IGameControlEvent() {
 			@Override public void onEvent(String name,float value) {
 				timeOfLast = System.currentTimeMillis()
@@ -91,7 +92,7 @@ IGameControlEvent listener = new IGameControlEvent() {
 				else if(name.contentEquals("x-mode")){
 					if(value>0) {
 						if(!walkMode) {
-							pose(new TransformNR(),cat,tips)
+							cat.pose(new TransformNR(),cat.getIMUFromCentroid(),tips)
 						}
 						walkMode=true;
 					}
@@ -101,7 +102,7 @@ IGameControlEvent listener = new IGameControlEvent() {
 						walkMode=false;
 						startPose = cat.getFiducialToGlobalTransform()
 
-						tips = getTipLocations( cat)
+						tips = cat.getTipLocations()
 					}
 				}
 				//	System.out.println(name+" is value= "+value);
@@ -125,7 +126,7 @@ try{
 			}
 		}else {
 			// pose mode
-			cat.pose(new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud)))
+			cat.pose(new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud)),cat.getIMUFromCentroid(),tips)
 		}
 	}
 }catch(Throwable t){
