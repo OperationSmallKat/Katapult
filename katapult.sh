@@ -59,5 +59,6 @@ if (! test -e ~/bin/katapult.desktop) then
 	ln -s ~/bin/katapult.desktop ~/Desktop/katapult.desktop
 	gio set ~/Desktop/katapult.desktop "metadata::trusted" yes
 fi
-
-$JVMDIR/bin/java -jar ~/bin/BowlerStudioInstall/1.24.0/BowlerStudio.jar -g https://github.com/OperationSmallKat/Katapult.git launch.groovy 
+value=`cat ~/bin/BowlerStudioInstall/currentversion.txt`
+echo "$value"
+$JVMDIR/bin/java -jar ~/bin/BowlerStudioInstall/$value/BowlerStudio.jar -g https://github.com/OperationSmallKat/Katapult.git launch.groovy 

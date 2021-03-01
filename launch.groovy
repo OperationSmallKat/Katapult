@@ -126,7 +126,9 @@ try{
 			}
 		}else {
 			// pose mode
-			cat.pose(new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud)),cat.getIMUFromCentroid(),tips)
+			def newPose = new TransformNR(0,-10*rz,10*x,new RotationNR(0,10*straif,5*ljud))
+			def around = cat.getIMUFromCentroid()
+			cat.pose(newPose,around,tips)
 		}
 	}
 }catch(Throwable t){
