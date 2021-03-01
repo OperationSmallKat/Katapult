@@ -60,4 +60,4 @@ if (! test -e ~/bin/katapult.desktop) then
 	gio set ~/Desktop/katapult.desktop "metadata::trusted" yes
 fi
 
-$JVMDIR/bin/java -jar ~/bin/BowlerStudioInstall/1.21.0/BowlerStudio.jar -g https://github.com/OperationSmallKat/Katapult.git launch.groovy 
+$JVMDIR/bin/java -jar ~/bin/BowlerStudioInstall/1.24.0/BowlerStudio.jar -g https://github.com/OperationSmallKat/Katapult.git launch.groovy 
