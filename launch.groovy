@@ -87,7 +87,7 @@ IGameControlEvent listener = new IGameControlEvent() {
 					ljud=value;
 				}
 				else if(name.contentEquals("r-joy-left-right")){
-					rz=value;
+					rz=-value;
 				}
 				else if(name.contentEquals("x-mode")){
 					if(value>0) {
