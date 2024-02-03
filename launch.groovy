@@ -23,7 +23,8 @@ def gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameContr
 	"X-Box",
 	"Game",
 	"XBOX",
-	"Microsoft"
+	"Microsoft",
+	"GPD"
 ])
 
 MobileBase cat =DeviceManager.getSpecificDevice(robotName, {
