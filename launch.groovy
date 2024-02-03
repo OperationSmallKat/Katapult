@@ -26,7 +26,7 @@ def gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameContr
 	"Microsoft",
 	"GPD"
 ])
-
+println "Loading robot "+robotName+" "+robotGit+" "+robotGitFile+" "+linkDeviceName
 MobileBase cat =DeviceManager.getSpecificDevice(robotName, {
 	return ScriptingEngine.gitScriptRun(	robotGit,
 			robotGitFile,null);
