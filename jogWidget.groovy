@@ -51,6 +51,7 @@ double lrl=0;
 double rud=0;
 double rlr=0;
 boolean rotation=false;
+boolean run=true;
 long timeOfLast = System.currentTimeMillis()
 
 IGameControlEvent listener = { name, value->
@@ -77,6 +78,12 @@ IGameControlEvent listener = { name, value->
 				rotation=false
 			}
 			break;
+		case "a-mode":
+			if(value>0.5) {
+				println "Exiting because A button pressed"
+				run=false
+			}
+			break;
 	}
 }
 g.clearListeners()
@@ -84,7 +91,7 @@ g.clearListeners()
 g.addListeners(listener);
 
 try{
-	while(!Thread.interrupted() ){
+	while(!Thread.interrupted() && run){
 		ThreadUtil.wait(100)
 		double bound = 0.3
 		if(rotation) {
@@ -93,9 +100,9 @@ try{
 			if(lud<-bound)
 				widget.elevation.jogMinusOne()
 			if(lrl>bound)
-				widget.tilt.jogPlusOne()
-			if(lrl<-bound)
 				widget.tilt.jogMinusOne()
+			if(lrl<-bound)
+				widget.tilt.jogPlusOne()
 			if(rlr>bound)
 				widget.azimuth.jogPlusOne()
 			if(rlr<-bound)
