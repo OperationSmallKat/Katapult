@@ -53,7 +53,7 @@ double rlr=0;
 boolean rotation=false;
 boolean run=true;
 long timeOfLast = System.currentTimeMillis()
-widget.setMode("Translation");
+widget.setMode("X for Translation, Y for Rotation");
 IGameControlEvent listener = { name, value->
 	switch(name) {
 		case "l-joy-up-down":
