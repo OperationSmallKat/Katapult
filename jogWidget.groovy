@@ -53,7 +53,7 @@ double rlr=0;
 boolean rotation=false;
 boolean run=true;
 long timeOfLast = System.currentTimeMillis()
-
+widget.setMode("Translation");
 IGameControlEvent listener = { name, value->
 	switch(name) {
 		case "l-joy-up-down":
@@ -71,11 +71,13 @@ IGameControlEvent listener = { name, value->
 		case "y-mode":
 			if(value>0.1) {
 				rotation=true
+				widget.setMode("Rotation");
 			}
 			break;
 		case "x-mode":
 			if(value>0.1) {
 				rotation=false
+				widget.setMode("Translation");
 			}
 			break;
 		case "a-mode":
