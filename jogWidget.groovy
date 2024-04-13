@@ -1,7 +1,11 @@
+import org.apache.commons.math3.geometry.euclidean.threed.Rotation
+
+import com.neuronrobotics.bowlerstudio.BowlerStudio
 import com.neuronrobotics.bowlerstudio.assets.ConfigurationDatabase
 import com.neuronrobotics.bowlerstudio.creature.TransformWidget
 import com.neuronrobotics.sdk.addons.gamepad.BowlerJInputDevice
 import com.neuronrobotics.sdk.addons.gamepad.IGameControlEvent
+import com.neuronrobotics.sdk.addons.kinematics.math.RotationNR
 import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR
 import com.neuronrobotics.sdk.common.DeviceManager
 import com.neuronrobotics.sdk.util.ThreadUtil
@@ -72,6 +76,13 @@ IGameControlEvent listener = { name, value->
 			if(value>0.1) {
 				rotation=true
 				widget.setMode("Rotation");
+				TransformNR current = BowlerStudio.getCamerFrame();
+				double currentRotZ = Math.toDegrees(current.getRotation().getRotationAzimuth());
+				println "Current rotation = "+currentRotZ
+				RotationNR rot = new RotationNR(0,currentRotZ-90,0);
+				TransformNR tf =new TransformNR(0,0,0,rot)
+
+				BowlerStudio.moveCamera(tf)
 			}
 			break;
 		case "x-mode":

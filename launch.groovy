@@ -32,9 +32,13 @@ MobileBase cat =DeviceManager.getSpecificDevice(robotName, {
 			robotGitFile,null);
 })
 def device = DeviceManager.getSpecificDevice(linkDeviceName)
+try{
 if(device.simple.isVirtual()) {
 	println "SmallKat Device is virtual"
 	//return;
+}
+}catch(Throwable t){
+	
 }
 BowlerJInputDevice g
 List<String> alreadyConnected = DeviceManager.listConnectedDevice(BowlerJInputDevice.class)
