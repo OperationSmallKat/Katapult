@@ -54,12 +54,17 @@ double lud=0;
 double lrl=0;
 double rud=0;
 double rlr=0;
+double trig=0;
+double zoom=0;
 boolean rotation=false;
 boolean run=true;
 long timeOfLast = System.currentTimeMillis()
 widget.setMode("X for Translation, Y for Rotation");
 IGameControlEvent listener = { name, value->
 	switch(name) {
+		case "pov-up-down":
+			zoom=value;
+			break;
 		case "l-joy-up-down":
 			lud=-value;
 			break;
@@ -76,13 +81,6 @@ IGameControlEvent listener = { name, value->
 			if(value>0.1) {
 				rotation=true
 				widget.setMode("Rotation");
-				TransformNR current = BowlerStudio.getCamerFrame();
-				double currentRotZ = Math.toDegrees(current.getRotation().getRotationAzimuth());
-				println "Current rotation = "+currentRotZ
-				RotationNR rot = new RotationNR(0,currentRotZ-90,0);
-				TransformNR tf =new TransformNR(0,0,0,rot)
-
-				BowlerStudio.moveCamera(tf)
 			}
 			break;
 		case "x-mode":
@@ -97,6 +95,14 @@ IGameControlEvent listener = { name, value->
 				run=false
 			}
 			break;
+		case"r-trig-button":
+			trig=value
+			break;
+		case"l-trig-button":
+			trig=-value;
+			break;
+		default:
+			println "Unmapped "+name+" "+value
 	}
 }
 g.clearListeners()
@@ -107,6 +113,18 @@ try{
 	while(!Thread.interrupted() && run){
 		ThreadUtil.wait(100)
 		double bound = 0.3
+		if(Math.abs(rlr)>0||Math.abs(rud)>0) {
+			TransformNR current = BowlerStudio.getCamerFrame();
+			double currentRotZ = Math.toDegrees(current.getRotation().getRotationAzimuth());
+			println "Current rotation = "+currentRotZ
+			RotationNR rot = new RotationNR(rud*widget.rotationIncrement*5,rlr*widget.rotationIncrement*5,0);
+			TransformNR tf =new TransformNR(0,0,0,rot)
+
+			BowlerStudio.moveCamera(tf)
+		}
+		if(Math.abs(zoom)>0) {
+			BowlerStudio.zoomCamera(zoom*50)
+		}
 		if(rotation) {
 			if(lud>bound)
 				widget.tilt.jogPlusOne()
@@ -116,9 +134,9 @@ try{
 				widget.elevation.jogPlusOne()
 			if(lrl<-bound)
 				widget.elevation.jogMinusOne()
-			if(rlr>bound)
+			if(trig>bound)
 				widget.azimuth.jogPlusOne()
-			if(rlr<-bound)
+			if(trig<-bound)
 				widget.azimuth.jogMinusOne()
 		}else {
 			if(lud>bound)
@@ -129,17 +147,17 @@ try{
 				widget.ty.jogPlusOne()
 			if(lrl<-bound)
 				widget.ty.jogMinusOne()
-			if(rud>bound)
+			if(trig>bound)
 				widget.tz.jogPlusOne()
-			if(rud<-bound)
+			if(trig<-bound)
 				widget.tz.jogMinusOne()
 		}
 	}
 }catch(Throwable t){
-	if(RuntimeException.class.isInstance(t))
-		return;
-	t.printStackTrace()
+	if(!RuntimeException.class.isInstance(t))
+		t.printStackTrace()
 }
+println "Clean exit from jogWidget.groovy in Katapult"
 //remove listener and exit
 g.removeListeners(listener);
 
