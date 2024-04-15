@@ -122,18 +122,30 @@ Quadrent getQuad(double angle) {
 	throw new RuntimeException("Impossible nummber! "+angle);
 }	
 try{
-	double currentRotZ = Math.toDegrees(BowlerStudio.getCamerFrame().getRotation().getRotationAzimuth());
+	def getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
+	double currentRotZ = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth());
 	
 	Quadrent quad = getQuad(currentRotZ)
 	while(!Thread.interrupted() && run){
 		ThreadUtil.wait(100)
 		double threshhold = 0.3
 		if(Math.abs(rlr)>0||Math.abs(rud)>0) {
-			currentRotZ = Math.toDegrees(BowlerStudio.getCamerFrame().getRotation().getRotationAzimuth());
+			getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
+			currentRotZ = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth());
+			double currentEle = Math.toDegrees(getCamerFrameGetRotation.getRotationTilt());
+			double elSet= rud
+			def stepRotation = widget.rotationIncrement*5
+			
+			if((currentEle>(180) || currentEle<-90 )&& elSet>0) {
+				elSet=0;
+			}
+			if((currentEle<0&& currentEle>-90)&& elSet<0) {
+				elSet=0;
+			}
 			quad = getQuad(currentRotZ)
-			println "Current rotation = "+currentRotZ
+			println "Current rotation = "+currentRotZ+" ele = "+currentEle+" elSet "+ elSet
 			println quad
-			RotationNR rot = new RotationNR(rud*widget.rotationIncrement*5,rlr*widget.rotationIncrement*5,0);
+			RotationNR rot = new RotationNR(elSet*stepRotation,rlr*stepRotation,0);
 			TransformNR tf =new TransformNR(0,0,0,rot)
 
 			BowlerStudio.moveCamera(tf)
