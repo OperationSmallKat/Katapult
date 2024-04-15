@@ -143,8 +143,8 @@ try{
 				elSet=0;
 			}
 			quad = getQuad(currentRotZ)
-			println "Current rotation = "+currentRotZ+" ele = "+currentEle+" elSet "+ elSet
-			println quad
+			//println "Current rotation = "+currentRotZ+" ele = "+currentEle+" elSet "+ elSet
+			//println quad
 			RotationNR rot = new RotationNR(elSet*stepRotation,rlr*stepRotation,0);
 			TransformNR tf =new TransformNR(0,0,0,rot)
 
