@@ -10,6 +10,8 @@ import com.neuronrobotics.sdk.addons.kinematics.math.TransformNR
 import com.neuronrobotics.sdk.common.DeviceManager
 import com.neuronrobotics.sdk.util.ThreadUtil
 
+import javafx.event.ActionEvent
+
 TransformWidget widget = args[0]
 
 println widget
@@ -127,12 +129,12 @@ try{
 	double currentRotZ = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth());
 	
 	Quadrent quad = getQuad(currentRotZ)
-	while(!Thread.interrupted() && run){
-		ThreadUtil.wait(100)
+	while(!Thread.interrupted() && run ){
+		Thread.sleep(100)
 		double threshhold = 0.3
+		getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
+		currentRotZ = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth());
 		if(Math.abs(rlr)>0||Math.abs(rud)>0) {
-			getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
-			currentRotZ = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth());
 			double currentEle = Math.toDegrees(getCamerFrameGetRotation.getRotationTilt());
 			double elSet= rud
 			def stepRotation = widget.rotationIncrement*5
@@ -154,39 +156,90 @@ try{
 		if(Math.abs(zoom)>0) {
 			BowlerStudio.zoomCamera(zoom*50)
 		}
-		TransformNR stateUnitVector = new TransformNR();
+		TransformNR stateUnitVectorTmp = new TransformNR();
+		
 		if(lud>threshhold)
-			stateUnitVector.translateX(1);
+			stateUnitVectorTmp.translateX(1);
 		if(lud<-threshhold)
-			stateUnitVector.translateX(-1);
+			stateUnitVectorTmp.translateX(-1);
 		if(lrl>threshhold)
-			stateUnitVector.translateY(1);
+			stateUnitVectorTmp.translateY(1);
 		if(lrl<-threshhold)
-			stateUnitVector.translateY(-1);
+			stateUnitVectorTmp.translateY(-1);
 		if(trig>threshhold)
-			stateUnitVector.translateZ(1);
+			stateUnitVectorTmp.translateZ(1);
 		if(trig<-threshhold)
-			stateUnitVector.translateZ(-1);
+			stateUnitVectorTmp.translateZ(-1);
 		TransformNR orentationOffset = new TransformNR(0,0,0,new RotationNR(0,currentRotZ-90,0))
 		TransformNR frame = BowlerStudio. getTargetFrame() ;
 		TransformNR frameOffset = new TransformNR(0,0,0,frame.getRotation())
-		stateUnitVector=frameOffset.times( orentationOffset.times(stateUnitVector))
+		TransformNR stateUnitVector = new TransformNR();
+		
 		double bound =0.5;
 		if(rotation) {
-			if(stateUnitVector.getX()<-bound)
-				wrapintPlusOne(widget.tilt,widget.rotationIncrement)
-			if(stateUnitVector.getX()>bound)
-				wrapintMinusOne(widget.tilt,widget.rotationIncrement)
-			if(stateUnitVector.getY()<-bound)
-				widget.elevation.jogPlusOne()
-			if(stateUnitVector.getY()>bound)
-				widget.elevation.jogMinusOne()
-			if(stateUnitVector.getZ()<-bound) {
-				wrapintPlusOne(widget.azimuth,widget.rotationIncrement)
+			stateUnitVector= orentationOffset.times(stateUnitVectorTmp)
+			double incement = widget.rotationIncrement;
+			double eleUpdate = 0;
+			double tiltUpdate = 0;
+			double azUpdate = 0;
+			boolean updateTrig = false;
+			if(stateUnitVector.getY()<-bound) {
+				tiltUpdate+=incement
+				updateTrig=true
 			}
-			if(stateUnitVector.getZ()>bound)
-				wrapintMinusOne(widget.azimuth,widget.rotationIncrement)
+			if(stateUnitVector.getY()>bound) {
+				tiltUpdate-=incement
+				updateTrig=true
+				
+			}
+			if(stateUnitVector.getX()<-bound) {
+				eleUpdate-=incement;
+				updateTrig=true
+				
+			}
+			if(stateUnitVector.getX()>bound) {
+				eleUpdate+=incement
+				updateTrig=true
+				
+			}
+			if(stateUnitVector.getZ()<-bound) { 
+				azUpdate+=incement
+				updateTrig=true
+				
+			}
+			if(stateUnitVector.getZ()>bound) {
+				azUpdate-=incement
+				updateTrig=true
+				
+			}
+			if(!updateTrig)
+				continue;
+			TransformNR update = new TransformNR(0,0,0,new RotationNR(0,0,eleUpdate))
+			update = update.times(new TransformNR(0,0,0,new RotationNR(tiltUpdate,0,0)))
+			update = update.times(new TransformNR(0,0,0,new RotationNR(0,azUpdate,0)))
+			TransformNR current = widget.getCurrent();
+			TransformNR currentRotation = new TransformNR(0,0,0,current.getRotation())
+			TransformNR updatedRotation = current.times( 
+				currentRotation.inverse().times( 
+						frameOffset.inverse().times(update).times(frameOffset)
+						.times(currentRotation)
+					)
+				)
+			double azUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationAzimuth())
+			double  tiltUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationTilt())
+			double eleUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationElevation())
+			azUpdate2 = roundToNearist(azUpdate2,incement)
+			tiltUpdate2 = roundToNearist(tiltUpdate2,incement)
+			eleUpdate2 = roundToNearist(eleUpdate2,incement)
+			RotationNR bounded = new RotationNR(tiltUpdate2,azUpdate2,eleUpdate2)
+			current.setRotation(bounded)
+			//println"\n\n"
+			//println update.toSimpleString()
+			//println current.toSimpleString()
+			widget.updatePose(current)
+			widget.handle(null);
 		}else {
+			stateUnitVector=frameOffset.times( orentationOffset.times(stateUnitVectorTmp))
 			if(stateUnitVector.getX()>bound)
 				widget.tx.jogPlusOne()
 			if(stateUnitVector.getX()<-bound)
@@ -202,8 +255,11 @@ try{
 		}
 	}
 }catch(Throwable t){
-	//if(!RuntimeException.class.isInstance(t))
+	//if(!InterruptedException.class.isInstance(t))
 		t.printStackTrace()
+}
+double roundToNearist(double incoiming, double modulo) {
+	return modulo*(Math.round(incoiming/modulo))
 }
 void wrapintPlusOne(EngineeringUnitsSliderWidget wid,double increment) {
 	if(wid.getValue()+increment>wid.setpoint.getMax()) {
@@ -217,7 +273,7 @@ void wrapintMinusOne(EngineeringUnitsSliderWidget wid,double increment) {
 	}else
 		wid.jogMinusOne()
 }
-println "Clean exit from jogWidget.groovy in Katapult"
+println "Clean exit from jogWidget.groovy in Katapult contains="+g.listeners.contains(listener)+" run="+run
 //remove listener and exit
 g.removeListeners(listener);
 
