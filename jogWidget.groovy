@@ -1,4 +1,3 @@
-import org.apache.commons.math3.geometry.euclidean.threed.Rotation
 
 import com.neuronrobotics.bowlerstudio.BowlerStudio
 import com.neuronrobotics.bowlerstudio.assets.ConfigurationDatabase
@@ -108,15 +107,32 @@ IGameControlEvent listener = { name, value->
 g.clearListeners()
 // gamepad is a BowlerJInputDevice
 g.addListeners(listener);
-
+public enum Quadrent {
+	first,second,third,fourth
+}
+Quadrent getQuad(double angle) {
+	if(angle>45 && angle<135)
+		return Quadrent.first;
+	if(angle>135 ||angle < (-135))
+		return Quadrent.second;
+	if(angle>-135&& angle<-45)
+		return Quadrent.third;
+	if(angle>-45&&angle<45)
+		return Quadrent.fourth;
+	throw new RuntimeException("Impossible nummber! "+angle);
+}	
 try{
+	double currentRotZ = Math.toDegrees(BowlerStudio.getCamerFrame().getRotation().getRotationAzimuth());
+	
+	Quadrent quad = getQuad(currentRotZ)
 	while(!Thread.interrupted() && run){
 		ThreadUtil.wait(100)
-		double bound = 0.3
+		double threshhold = 0.3
 		if(Math.abs(rlr)>0||Math.abs(rud)>0) {
-			TransformNR current = BowlerStudio.getCamerFrame();
-			double currentRotZ = Math.toDegrees(current.getRotation().getRotationAzimuth());
+			currentRotZ = Math.toDegrees(BowlerStudio.getCamerFrame().getRotation().getRotationAzimuth());
+			quad = getQuad(currentRotZ)
 			println "Current rotation = "+currentRotZ
+			println quad
 			RotationNR rot = new RotationNR(rud*widget.rotationIncrement*5,rlr*widget.rotationIncrement*5,0);
 			TransformNR tf =new TransformNR(0,0,0,rot)
 
@@ -125,31 +141,49 @@ try{
 		if(Math.abs(zoom)>0) {
 			BowlerStudio.zoomCamera(zoom*50)
 		}
+		TransformNR stateUnitVector = new TransformNR();
+		if(lud>threshhold)
+			stateUnitVector.translateX(1);
+		if(lud<-threshhold)
+			stateUnitVector.translateX(-1);
+		if(lrl>threshhold)
+			stateUnitVector.translateY(1);
+		if(lrl<-threshhold)
+			stateUnitVector.translateY(-1);
+		if(trig>threshhold)
+			stateUnitVector.translateZ(1);
+		if(trig<-threshhold)
+			stateUnitVector.translateZ(-1);
+		TransformNR orentationOffset = new TransformNR(0,0,0,new RotationNR(0,currentRotZ-90,0))
+		TransformNR frame = BowlerStudio. getTargetFrame() ;
+		TransformNR frameOffset = new TransformNR(0,0,0,frame.getRotation())
+		stateUnitVector=frameOffset.times( orentationOffset.times(stateUnitVector))
+		double bound =0.5;
 		if(rotation) {
-			if(lud>bound)
+			if(stateUnitVector.getX()>bound)
 				widget.tilt.jogPlusOne()
-			if(lud<-bound)
+			if(stateUnitVector.getX()<-bound)
 				widget.tilt.jogMinusOne()
-			if(lrl>bound)
+			if(stateUnitVector.getY()>bound)
 				widget.elevation.jogPlusOne()
-			if(lrl<-bound)
+			if(stateUnitVector.getY()<-bound)
 				widget.elevation.jogMinusOne()
-			if(trig>bound)
+			if(stateUnitVector.getZ()>bound)
 				widget.azimuth.jogPlusOne()
-			if(trig<-bound)
+			if(stateUnitVector.getZ()<-bound)
 				widget.azimuth.jogMinusOne()
 		}else {
-			if(lud>bound)
+			if(stateUnitVector.getX()>bound)
 				widget.tx.jogPlusOne()
-			if(lud<-bound)
+			if(stateUnitVector.getX()<-bound)
 				widget.tx.jogMinusOne()
-			if(lrl>bound)
+			if(stateUnitVector.getY()>bound)
 				widget.ty.jogPlusOne()
-			if(lrl<-bound)
+			if(stateUnitVector.getY()<-bound)
 				widget.ty.jogMinusOne()
-			if(trig>bound)
+			if(stateUnitVector.getZ()>bound)
 				widget.tz.jogPlusOne()
-			if(trig<-bound)
+			if(stateUnitVector.getZ()<-bound)
 				widget.tz.jogMinusOne()
 		}
 	}
