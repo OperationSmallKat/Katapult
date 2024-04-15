@@ -1,6 +1,7 @@
 
 import com.neuronrobotics.bowlerstudio.BowlerStudio
 import com.neuronrobotics.bowlerstudio.assets.ConfigurationDatabase
+import com.neuronrobotics.bowlerstudio.creature.EngineeringUnitsSliderWidget
 import com.neuronrobotics.bowlerstudio.creature.TransformWidget
 import com.neuronrobotics.sdk.addons.gamepad.BowlerJInputDevice
 import com.neuronrobotics.sdk.addons.gamepad.IGameControlEvent
@@ -172,18 +173,19 @@ try{
 		stateUnitVector=frameOffset.times( orentationOffset.times(stateUnitVector))
 		double bound =0.5;
 		if(rotation) {
-			if(stateUnitVector.getX()>bound)
-				widget.tilt.jogPlusOne()
 			if(stateUnitVector.getX()<-bound)
-				widget.tilt.jogMinusOne()
-			if(stateUnitVector.getY()>bound)
-				widget.elevation.jogPlusOne()
+				wrapintPlusOne(widget.tilt,widget.rotationIncrement)
+			if(stateUnitVector.getX()>bound)
+				wrapintMinusOne(widget.tilt,widget.rotationIncrement)
 			if(stateUnitVector.getY()<-bound)
+				widget.elevation.jogPlusOne()
+			if(stateUnitVector.getY()>bound)
 				widget.elevation.jogMinusOne()
+			if(stateUnitVector.getZ()<-bound) {
+				wrapintPlusOne(widget.azimuth,widget.rotationIncrement)
+			}
 			if(stateUnitVector.getZ()>bound)
-				widget.azimuth.jogPlusOne()
-			if(stateUnitVector.getZ()<-bound)
-				widget.azimuth.jogMinusOne()
+				wrapintMinusOne(widget.azimuth,widget.rotationIncrement)
 		}else {
 			if(stateUnitVector.getX()>bound)
 				widget.tx.jogPlusOne()
@@ -200,8 +202,20 @@ try{
 		}
 	}
 }catch(Throwable t){
-	if(!RuntimeException.class.isInstance(t))
+	//if(!RuntimeException.class.isInstance(t))
 		t.printStackTrace()
+}
+void wrapintPlusOne(EngineeringUnitsSliderWidget wid,double increment) {
+	if(wid.getValue()+increment>wid.setpoint.getMax()) {
+		wid.setValue(wid.setpoint.getMin());
+	}else
+		wid.jogPlusOne()
+}
+void wrapintMinusOne(EngineeringUnitsSliderWidget wid,double increment) {
+	if(wid.getValue()-increment<wid.setpoint.getMin()) {
+		wid.setValue(wid.setpoint.getMax());
+	}else
+		wid.jogMinusOne()
 }
 println "Clean exit from jogWidget.groovy in Katapult"
 //remove listener and exit
