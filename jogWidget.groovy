@@ -239,19 +239,35 @@ try{
 			widget.updatePose(current)
 			widget.handle(null);
 		}else {
-			stateUnitVector=frameOffset.times( orentationOffset.times(stateUnitVectorTmp))
+			double incement = widget.linearIncrement;
+			stateUnitVector= orentationOffset.times(stateUnitVectorTmp)
+			stateUnitVector.setRotation(new RotationNR())
+			boolean updateTrig = false;
 			if(stateUnitVector.getX()>bound)
-				widget.tx.jogPlusOne()
+				updateTrig=true
 			if(stateUnitVector.getX()<-bound)
-				widget.tx.jogMinusOne()
+				updateTrig=true
 			if(stateUnitVector.getY()>bound)
-				widget.ty.jogPlusOne()
+				updateTrig=true
 			if(stateUnitVector.getY()<-bound)
-				widget.ty.jogMinusOne()
+				updateTrig=true
 			if(stateUnitVector.getZ()>bound)
-				widget.tz.jogPlusOne()
+				updateTrig=true
 			if(stateUnitVector.getZ()<-bound)
-				widget.tz.jogMinusOne()
+				updateTrig=true
+			if(!updateTrig)
+				continue;
+			stateUnitVector=new TransformNR(
+				roundToNearist(stateUnitVector.getX(),incement),
+				roundToNearist(stateUnitVector.getY(),incement),
+				roundToNearist(stateUnitVector.getZ(),incement))
+			TransformNR current = widget.getCurrent();
+			TransformNR currentRotation = new TransformNR(0,0,0,current.getRotation())
+			TransformNR tf= current.times(	frameOffset.inverse().times(stateUnitVector).times(frameOffset))
+			//println "\n\n"
+			//println tf.toSimpleString()
+			widget.updatePose(tf)
+			widget.handle(null);
 		}
 	}
 }catch(Throwable t){
