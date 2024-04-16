@@ -270,12 +270,17 @@ try{
 			if(!updateTrig)
 				continue;
 			stateUnitVector=new TransformNR(
-				roundToNearist(stateUnitVector.getX(),incement),
-				roundToNearist(stateUnitVector.getY(),incement),
-				roundToNearist(stateUnitVector.getZ(),incement))
+				roundToNearist(stateUnitVector.getX()*incement,incement),
+				roundToNearist(stateUnitVector.getY()*incement,incement),
+				roundToNearist(stateUnitVector.getZ()*incement,incement))
 			TransformNR current = widget.getCurrent();
 			TransformNR currentRotation = new TransformNR(0,0,0,current.getRotation())
-			TransformNR tf= current.times(	frameOffset.inverse().times(stateUnitVector).times(frameOffset))
+			TransformNR tf= current.times(	
+									currentRotation.inverse().times(
+										frameOffset.inverse().times(stateUnitVector).times(frameOffset)						
+									.times(currentRotation)
+								)
+							)
 			//println "\n\n"
 			//println tf.toSimpleString()
 			widget.updatePose(tf)
