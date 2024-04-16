@@ -123,18 +123,30 @@ Quadrent getQuad(double angle) {
 	if(angle>-45&&angle<45)
 		return Quadrent.fourth;
 	throw new RuntimeException("Impossible nummber! "+angle);
-}	
+}
+double 	QuadrentToAngle(Quadrent q) {
+	switch(q) {
+		case Quadrent.first:
+		return 90;
+		case Quadrent.second:
+		return 180;
+		case Quadrent.third:
+		return -90;
+		case Quadrent.fourth:
+		return 0;
+	}
+}
 try{
-	def getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
-	double currentRotZ = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth());
-	
-	Quadrent quad = getQuad(currentRotZ)
+	RotationNR getCamerFrameGetRotation;
+	double currentRotZ ;
+	Quadrent quad ;
 	while(!Thread.interrupted() && run ){
 		Thread.sleep(100)
 		double threshhold = 0.3
 		getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
-		currentRotZ = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth());
-		if(Math.abs(rlr)>0||Math.abs(rud)>0) {
+		quad = getQuad(Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth()))
+		currentRotZ = QuadrentToAngle(quad);
+		if(Math.abs(rlr)>0.1||Math.abs(rud)>0.1) {
 			double currentEle = Math.toDegrees(getCamerFrameGetRotation.getRotationTilt());
 			double elSet= rud
 			def stepRotation = widget.rotationIncrement*5
