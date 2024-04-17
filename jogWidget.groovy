@@ -144,7 +144,8 @@ try{
 		Thread.sleep(100)
 		double threshhold = 0.3
 		getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
-		quad = getQuad(Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth()))
+		def toDegrees = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth())
+		quad = getQuad(toDegrees)
 		currentRotZ = QuadrentToAngle(quad);
 		if(Math.abs(rlr)>0.1||Math.abs(rud)>0.1) {
 			double currentEle = Math.toDegrees(getCamerFrameGetRotation.getRotationTilt());
@@ -159,7 +160,7 @@ try{
 			}
 			quad = getQuad(currentRotZ)
 			//println "Current rotation = "+currentRotZ+" ele = "+currentEle+" elSet "+ elSet
-			//println quad
+			//println "Quadtent: "+quad
 			RotationNR rot = new RotationNR(elSet*stepRotation,rlr*stepRotation,0);
 			TransformNR tf =new TransformNR(0,0,0,rot)
 
@@ -168,58 +169,59 @@ try{
 		if(Math.abs(zoom)>0) {
 			BowlerStudio.zoomCamera(zoom*50)
 		}
-		TransformNR stateUnitVectorTmp = new TransformNR();
-		
-		if(lud>threshhold)
-			stateUnitVectorTmp.translateX(1);
-		if(lud<-threshhold)
-			stateUnitVectorTmp.translateX(-1);
-		if(lrl>threshhold)
-			stateUnitVectorTmp.translateY(1);
-		if(lrl<-threshhold)
-			stateUnitVectorTmp.translateY(-1);
-		if(trig>threshhold)
-			stateUnitVectorTmp.translateZ(1);
-		if(trig<-threshhold)
-			stateUnitVectorTmp.translateZ(-1);
+
 		TransformNR orentationOffset = new TransformNR(0,0,0,new RotationNR(0,currentRotZ-90,0))
-		TransformNR frame = BowlerStudio. getTargetFrame() ;
+		TransformNR frame = BowlerStudio.getTargetFrame() ;
 		TransformNR frameOffset = new TransformNR(0,0,0,frame.getRotation())
 		TransformNR stateUnitVector = new TransformNR();
 		
 		double bound =0.5;
 		if(rotation) {
+			TransformNR stateUnitVectorTmp = new TransformNR();
+			
+			if(lud>threshhold)
+				stateUnitVectorTmp.translateY(1);
+			if(lud<-threshhold)
+				stateUnitVectorTmp.translateY(-1);
+			if(lrl>threshhold)
+				stateUnitVectorTmp.translateZ(1);
+			if(lrl<-threshhold)
+				stateUnitVectorTmp.translateZ(-1);
+			if(trig>threshhold)
+				stateUnitVectorTmp.translateX(1);
+			if(trig<-threshhold)
+				stateUnitVectorTmp.translateX(-1);
 			stateUnitVector= orentationOffset.times(stateUnitVectorTmp)
 			double incement = widget.rotationIncrement;
 			double eleUpdate = 0;
 			double tiltUpdate = 0;
 			double azUpdate = 0;
 			boolean updateTrig = false;
-			if(stateUnitVector.getY()<-bound) {
+			if(stateUnitVector.getX()<-bound) {
 				tiltUpdate+=incement
 				updateTrig=true
 			}
-			if(stateUnitVector.getY()>bound) {
+			if(stateUnitVector.getX()>bound) {
 				tiltUpdate-=incement
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getZ()<-bound) {
+			if(stateUnitVector.getY()<-bound) {
 				eleUpdate-=incement;
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getZ()>bound) {
+			if(stateUnitVector.getY()>bound) {
 				eleUpdate+=incement
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getX()<-bound) { 
+			if(stateUnitVector.getZ()<-bound) { 
 				azUpdate-=incement
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getX()>bound) {
+			if(stateUnitVector.getZ()>bound) {
 				azUpdate+=incement
 				updateTrig=true
 				
@@ -240,10 +242,16 @@ try{
 			double azUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationAzimuth())
 			double  tiltUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationTilt())
 			double eleUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationElevation())
-//			azUpdate2 = roundToNearist(azUpdate2,incement)
-//			tiltUpdate2 = roundToNearist(tiltUpdate2,incement)
-//			eleUpdate2 = roundToNearist(eleUpdate2,incement)
-			RotationNR bounded = new RotationNR(tiltUpdate2,azUpdate2,eleUpdate2)
+//			azUpdate2 = roundToNearist(azUpdate2,1)
+//			tiltUpdate2 = roundToNearist(tiltUpdate2,1)
+//			eleUpdate2 = roundToNearist(eleUpdate2,1)
+			RotationNR bounded
+			try {
+				bounded = new RotationNR(tiltUpdate2,azUpdate2,eleUpdate2)
+			}catch(java.lang.RuntimeException ex) {
+				ex.printStackTrace();
+				bounded = new RotationNR(0,0,89.999)
+			}
 			current.setRotation(updatedRotation.getRotation())
 			//println"\n\n"
 			//println update.toSimpleString()
@@ -251,6 +259,20 @@ try{
 			widget.updatePose(current)
 			widget.handle(null);
 		}else {
+			TransformNR stateUnitVectorTmp = new TransformNR();
+			
+			if(lud>threshhold)
+				stateUnitVectorTmp.translateX(1);
+			if(lud<-threshhold)
+				stateUnitVectorTmp.translateX(-1);
+			if(lrl>threshhold)
+				stateUnitVectorTmp.translateY(1);
+			if(lrl<-threshhold)
+				stateUnitVectorTmp.translateY(-1);
+			if(trig>threshhold)
+				stateUnitVectorTmp.translateZ(1);
+			if(trig<-threshhold)
+				stateUnitVectorTmp.translateZ(-1);
 			double incement = widget.linearIncrement;
 			stateUnitVector= orentationOffset.times(stateUnitVectorTmp)
 			stateUnitVector.setRotation(new RotationNR())
