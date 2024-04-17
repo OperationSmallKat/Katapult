@@ -204,23 +204,23 @@ try{
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getX()<-bound) {
+			if(stateUnitVector.getZ()<-bound) {
 				eleUpdate-=incement;
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getX()>bound) {
+			if(stateUnitVector.getZ()>bound) {
 				eleUpdate+=incement
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getZ()<-bound) { 
-				azUpdate+=incement
+			if(stateUnitVector.getX()<-bound) { 
+				azUpdate-=incement
 				updateTrig=true
 				
 			}
-			if(stateUnitVector.getZ()>bound) {
-				azUpdate-=incement
+			if(stateUnitVector.getX()>bound) {
+				azUpdate+=incement
 				updateTrig=true
 				
 			}
@@ -240,11 +240,11 @@ try{
 			double azUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationAzimuth())
 			double  tiltUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationTilt())
 			double eleUpdate2 = Math.toDegrees(updatedRotation.getRotation().getRotationElevation())
-			azUpdate2 = roundToNearist(azUpdate2,incement)
-			tiltUpdate2 = roundToNearist(tiltUpdate2,incement)
-			eleUpdate2 = roundToNearist(eleUpdate2,incement)
+//			azUpdate2 = roundToNearist(azUpdate2,incement)
+//			tiltUpdate2 = roundToNearist(tiltUpdate2,incement)
+//			eleUpdate2 = roundToNearist(eleUpdate2,incement)
 			RotationNR bounded = new RotationNR(tiltUpdate2,azUpdate2,eleUpdate2)
-			current.setRotation(bounded)
+			current.setRotation(updatedRotation.getRotation())
 			//println"\n\n"
 			//println update.toSimpleString()
 			//println current.toSimpleString()
