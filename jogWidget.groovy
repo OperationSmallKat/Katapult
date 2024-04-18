@@ -15,14 +15,16 @@ import javafx.event.ActionEvent
 TransformWidget widget = args[0]
 
 println widget
-def gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", [
+ArrayList<String> local = [
 	"Dragon",
 	"X-Box",
 	"Game",
 	"XBOX",
 	"Microsoft",
 	"GPD"
-])
+]
+ArrayList<String> gameControllerNames = ConfigurationDatabase.getObject("katapult", "gameControllerNames", local)
+gameControllerNames.addAll(local)
 
 BowlerJInputDevice g
 List<String> alreadyConnected = DeviceManager.listConnectedDevice(BowlerJInputDevice.class)
