@@ -62,6 +62,8 @@ double trig=0;
 double zoom=0;
 boolean rotation=false;
 boolean run=true;
+boolean dirty=false;
+long timeSinceLastControl=0;
 long timeOfLast = System.currentTimeMillis()
 widget.setMode("X for Translation, Y for Rotation");
 IGameControlEvent listener = { name, value->
@@ -107,7 +109,10 @@ IGameControlEvent listener = { name, value->
 			break;
 		default:
 			println "Unmapped "+name+" "+value
+			return;
 	}
+	dirty=true;
+	timeSinceLastControl=System.currentTimeMillis();
 }
 g.clearListeners()
 // gamepad is a BowlerJInputDevice
@@ -178,6 +183,31 @@ try{
 		TransformNR stateUnitVector = new TransformNR();
 		
 		double bound =0.5;
+		if(dirty) {
+			if(System.currentTimeMillis()-timeSinceLastControl>500) {
+				dirty=false;
+				TransformNR current = widget.getCurrent();
+
+				double azUpdate2 = Math.toDegrees(current.getRotation().getRotationAzimuth())
+				double  tiltUpdate2 = Math.toDegrees(current.getRotation().getRotationTilt())
+				double eleUpdate2 = Math.toDegrees(current.getRotation().getRotationElevation())
+				azUpdate2 = roundToNearist(azUpdate2,widget.rotationIncrement)
+				tiltUpdate2 = roundToNearist(tiltUpdate2,widget.rotationIncrement)
+				eleUpdate2 = roundToNearist(eleUpdate2,widget.rotationIncrement)
+				RotationNR bounded
+				try {
+					bounded = new RotationNR(tiltUpdate2,azUpdate2,eleUpdate2)
+				}catch(java.lang.RuntimeException ex) {
+					ex.printStackTrace();
+					bounded = new RotationNR(0,0,89.999)
+				}
+				//println "Bounding rotations "
+				
+				current.setRotation(bounded)
+				widget.updatePose(current)
+				widget.handle(null);
+			}
+		}
 		if(rotation) {
 			TransformNR stateUnitVectorTmp = new TransformNR();
 			
