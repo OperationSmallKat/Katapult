@@ -64,6 +64,8 @@ boolean rotation=false;
 boolean run=true;
 boolean dirty=false;
 long timeSinceLastControl=0;
+double threshhold = 0.3
+
 long timeOfLast = System.currentTimeMillis()
 widget.setMode("X for Translation, Y for Rotation");
 IGameControlEvent listener = { name, value->
@@ -111,7 +113,9 @@ IGameControlEvent listener = { name, value->
 			println "Unmapped "+name+" "+value
 			return;
 	}
-	dirty=true;
+	//println "Dirty ("+name+")"
+	if(Math.abs(value)>threshhold)
+		dirty=true;
 	timeSinceLastControl=System.currentTimeMillis();
 }
 g.clearListeners()
@@ -149,7 +153,6 @@ try{
 	Quadrent quad ;
 	while(!Thread.interrupted() && run ){
 		Thread.sleep(100)
-		double threshhold = 0.3
 		getCamerFrameGetRotation = BowlerStudio.getCamerFrame().getRotation()
 		def toDegrees = Math.toDegrees(getCamerFrameGetRotation.getRotationAzimuth())
 		quad = getQuad(toDegrees)
@@ -201,7 +204,7 @@ try{
 					ex.printStackTrace();
 					bounded = new RotationNR(0,0,89.999)
 				}
-				//println "Bounding rotations "
+				//println "Bounding rotations "+System.currentTimeMillis()
 				
 				current.setRotation(bounded)
 				widget.updatePose(current)
