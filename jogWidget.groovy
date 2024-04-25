@@ -172,7 +172,7 @@ try{
 			quad = getQuad(currentRotZ)
 			//println "Current rotation = "+currentRotZ+" ele = "+currentEle+" elSet "+ elSet
 			//println "Quadtent: "+quad
-			RotationNR rot = new RotationNR(elSet*1,rlr*1,0);
+			RotationNR rot = new RotationNR(elSet*3,rlr*3,0);
 			TransformNR tf =new TransformNR(0,0,0,rot)
 
 			BowlerStudio.moveCamera(tf)
