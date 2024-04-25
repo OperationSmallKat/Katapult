@@ -205,7 +205,12 @@ try{
 					bounded = new RotationNR(0,0,89.999)
 				}
 				//println "Bounding rotations "+System.currentTimeMillis()
+				double incement = widget.linearIncrement;
 				
+				current=new TransformNR(
+				roundToNearist(current.getX(),incement),
+				roundToNearist(current.getY(),incement),
+				roundToNearist(current.getZ(),incement));
 				current.setRotation(bounded)
 				widget.updatePose(current)
 				widget.handle(null);
