@@ -72,7 +72,7 @@ IGameControlEvent listener = { name, value->
 	switch(name) {
 		case "arrow-up-down":
 			zoom=value;
-			break;
+			return;
 		case "l-joy-up-down":
 			lud=-value;
 			break;
@@ -81,28 +81,28 @@ IGameControlEvent listener = { name, value->
 			break;
 		case "r-joy-up-down":
 			rud=-value;
-			break;
+			return;
 		case "r-joy-left-right":
 			rlr=-value;
-			break;
+			return;
 		case "y-mode":
 			if(value>0.1) {
 				rotation=true
 				widget.setMode("Rotation");
 			}
-			break;
+			return;
 		case "x-mode":
 			if(value>0.1) {
 				rotation=false
 				widget.setMode("Translation");
 			}
-			break;
-		case "a-mode":
-			if(value>0.5) {
-				println "Exiting because A button pressed"
-				run=false
-			}
-			break;
+			return;
+//		case "a-mode":
+//			if(value>0.5) {
+//				println "Exiting because A button pressed"
+//				run=false
+//			}
+//			return;
 		case"r-trig-button":
 			trig=value
 			break;
