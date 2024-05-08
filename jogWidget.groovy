@@ -70,7 +70,7 @@ long timeOfLast = System.currentTimeMillis()
 widget.setMode("X for Translation, Y for Rotation");
 IGameControlEvent listener = { name, value->
 	switch(name) {
-		case "pov-up-down":
+		case "arrow-up-down":
 			zoom=value;
 			break;
 		case "l-joy-up-down":
